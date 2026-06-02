@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KBS ビジネスアイデアジェネレーター</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1C2B4A;
+    --orange: #E8704A;
+    --teal: #4AADA8;
+    --cream: #FBF6EE;
+    --white: #FFFFFF;
+    --text-dark: #1C2B4A;
+    --text-mid: #4A5A6A;
+    --text-light: #8899AA;
+    --border: #E5E9F0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--cream); color: var(--text-dark); min-height: 100vh; padding: 0 0 60px; }
+  .header { background: var(--navy); padding: 20px; text-align: center; }
+  .header-logo { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+  .header h1 { font-size: 20px; font-weight: 900; color: #FFFFFF; line-height: 1.4; }
+  .header h1 span { color: #E8704A; }
+  .header p { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 6px; line-height: 1.6; }
+  .main { max-width: 560px; margin: 0 auto; padding: 24px 16px; }
+  .card { background: #FFFFFF; border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(28,43,74,0.07); }
+  .card-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #E8704A; text-transform: uppercase; margin-bottom: 8px; }
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 13px; font-weight: 700; color: #1C2B4A; margin-bottom: 6px; }
+  .field input, .field select { width: 100%; padding: 12px 14px; font-size: 15px; border: 1.5px solid #E5E9F0; border-radius: 10px; background: #FBF6EE; color: #1C2B4A; font-family: 'Noto Sans JP', sans-serif; transition: border-color 0.15s; -webkit-appearance: none; }
+  .field input:focus, .field select:focus { outline: none; border-color: #E8704A; background: #FFFFFF; }
+  .field-hint { font-size: 12px; color: #8899AA; margin-top: 5px; line-height: 1.5; }
+  .age-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+  .age-tab { padding: 9px 4px; font-size: 13px; font-weight: 700; border: 1.5px solid #E5E9F0; border-radius: 10px; background: #FBF6EE; color: #4A5A6A; cursor: pointer; text-align: center; transition: all 0.15s; font-family: 'Noto Sans JP', sans-serif; }
+  .age-tab:hover { border-color: #E8704A; color: #E8704A; }
+  .age-tab.active { background: #E8704A; border-color: #E8704A; color: #FFFFFF; }
+  .age-select-wrap { display: none; }
+  .age-select-wrap.visible { display: block; }
+  .btn { width: 100%; padding: 16px; font-size: 16px; font-weight: 700; background: #E8704A; border: none; border-radius: 12px; color: #FFFFFF; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: opacity 0.15s, transform 0.1s; box-shadow: 0 4px 16px rgba(232,112,74,0.35); }
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: scale(0.98); }
+  .result-card { background: #FFFFFF; border-radius: 14px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(28,43,74,0.07); border-left: 4px solid #E8704A; animation: fadeUp 0.4s ease both; }
+  .result-card:nth-child(2) { animation-delay: 0.1s; border-left-color: #4AADA8; }
+  .result-card:nth-child(3) { animation-delay: 0.2s; border-left-color: #1C2B4A; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .result-num { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #8899AA; text-transform: uppercase; margin-bottom: 6px; }
+  .result-title { font-size: 17px; font-weight: 700; color: #1C2B4A; margin-bottom: 8px; line-height: 1.4; }
+  .result-body { font-size: 14px; color: #4A5A6A; line-height: 1.8; }
+  .result-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 50px; background: rgba(232,112,74,0.1); color: #E8704A; margin-bottom: 14px; }
+  .error { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 10px; padding: 14px; color: #DC2626; font-size: 14px; line-height: 1.7; margin-top: 14px; }
+  .retry-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 700; background: #FFFFFF; border: 1.5px solid #E5E9F0; border-radius: 12px; color: #4A5A6A; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; margin-top: 8px; transition: all 0.15s; }
+  .retry-btn:hover { border-color: #E8704A; color: #E8704A; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">KBS Kids Business School</div>
+  <h1>ビジネスアイデア<span>ジェネレーター</span></h1>
+  <p>「好き」と「誰のために」を入力するだけで<br>ビジネスアイデアを3つ提案します</p>
+</div>
+
+<div class="main">
+  <div class="card">
+    <div class="card-label">STEP 1　入力する</div>
+    <div class="field">
+      <label for="suki">好き（動詞）</label>
+      <input type="text" id="suki" placeholder="例：カードの相場を調べる" />
+      <div class="field-hint">「〇〇をするのが好き」という形で入力してね</div>
+    </div>
+    <div class="field">
+      <label for="dare">誰のために</label>
+      <input type="text" id="dare" placeholder="例：ポケモン初心者" />
+      <div class="field-hint">どんな人の役に立てそうか入力してね</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">STEP 2　年齢・学年を選ぶ</div>
+    <div class="age-tabs">
+      <button class="age-tab" onclick="selectAge('kids')" id="tab-kids">小学生</button>
+      <button class="age-tab" onclick="selectAge('middle')" id="tab-middle">中学生</button>
+      <button class="age-tab" onclick="selectAge('high')" id="tab-high">高校生</button>
+      <button class="age-tab" onclick="selectAge('adult')" id="tab-adult">大人</button>
+    </div>
+    <div class="age-select-wrap" id="wrap-kids">
+      <select id="sel-kids">
+        <option value="">学年を選んでね</option>
+        <option value="小学4年生">小学4年生</option>
+        <option value="小学5年生">小学5年生</option>
+        <option value="小学6年生">小学6年生</option>
+      </select>
+    </div>
+    <div class="age-select-wrap" id="wrap-middle">
+      <select id="sel-middle">
+        <option value="">学年を選んでね</option>
+        <option value="中学1年生">中学1年生</option>
+        <option value="中学2年生">中学2年生</option>
+        <option value="中学3年生">中学3年生</option>
+      </select>
+    </div>
+    <div class="age-select-wrap" id="wrap-high">
+      <select id="sel-high">
+        <option value="">学年を選んでね</option>
+        <option value="高校1年生">高校1年生</option>
+        <option value="高校2年生">高校2年生</option>
+        <option value="高校3年生">高校3年生</option>
+      </select>
+    </div>
+    <div class="age-select-wrap" id="wrap-adult">
+      <select id="sel-adult">
+        <option value="">年代を選んでね</option>
+        <option value="30代">30代</option>
+        <option value="40代">40代</option>
+        <option value="50代以上">50代以上</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generate()">アイデアを出してみる →</button>
+  <div id="results" style="margin-top:20px;"></div>
+</div>
+
+<script>
+let currentGroup = '';
+
+function selectAge(group) {
+  currentGroup = group;
+  ['kids','middle','high','adult'].forEach(function(g) {
+    document.getElementById('tab-' + g).classList.toggle('active', g === group);
+    document.getElementById('wrap-' + g).classList.toggle('visible', g === group);
+  });
+}
+
+function getLabel() {
+  if (!currentGroup) return '';
+  return document.getElementById('sel-' + currentGroup).value;
+}
+
+var verbMap = {
+  '調べる': ['情報をまとめて教える','ガイドを作って売る','代わりに調べる','解説動画を作る'],
+  '集める': ['コレクションを売る','希少品を代行で集める','情報を発信する','交換会を開く'],
+  '作る': ['作品を売る','オーダーを受ける','作り方を教える','デザインを受注する'],
+  '教える': ['個別に教える','まとめ資料を売る','動画で解説する','グループ講座を開く'],
+  '売る': ['代行販売する','仕入れて転売する','出品を代行する','相場情報を売る'],
+  '描く': ['イラストを受注する','デザインを売る','似顔絵を描く','キャラクターを作る'],
+  '書く': ['記事を代行する','まとめブログを作る','文章を代行する','レポートを書く'],
+  '料理する': ['レシピを売る','料理を作って売る','料理を教える','弁当を作る'],
+  '撮る': ['写真を代行する','写真を売る','撮影を教える','SNS用写真を撮る'],
+  '遊ぶ': ['攻略法を教える','攻略まとめを売る','一緒に遊ぶサービス','ゲーム配信をする'],
+  '読む': ['本を要約して売る','おすすめ本を紹介する','読書感想をまとめる','読み聞かせをする'],
+  '運動する': ['トレーニングを教える','メニューを作る','一緒に練習する','動画で解説する'],
+  '歌う': ['歌を教える','歌動画を作る','楽譜をまとめる','カラオケ練習を手伝う'],
+  '話す': ['通訳を代行する','スピーチを教える','プレゼンを手伝う','インタビューする'],
+  '考える': ['アイデアを提供する','企画を代わりに考える','相談に乗る','コンサルする'],
+  '直す': ['修理を代行する','修理を教える','メンテナンスする','道具を整備する'],
+  '探す': ['代わりに探す','おすすめリストを作る','情報を提供する','比較まとめを作る'],
+  '飾る': ['部屋を飾る代行','デザインを提案する','飾り方を教える','アイデアを売る'],
+  'デザインする': ['デザインを受注する','テンプレートを売る','ロゴを作る','チラシを作る'],
+  'ゲームする': ['攻略を教える','一緒にプレイする','まとめ情報を売る','配信する'],
+  '研究する': ['まとめレポートを作る','解説を書く','情報を発信する','教える'],
+  '分析する': ['データをまとめる','レポートを作る','アドバイスする','代わりに分析する'],
+  '計画する': ['旅行プランを作る','スケジュールを代行する','計画書を作る','提案する'],
+  '整理する': ['片付けを代行する','整理術を教える','収納を提案する','リスト化する'],
+};
+
+var businessForms = {
+  kids: [
+    {title: 'まとめシートを作って売る', how: 'メルカリやフリマで出品してみよう'},
+    {title: '友達に教えてお小遣いをもらう', how: '近くの人に直接声をかけてみよう'},
+    {title: '手作り作品を出品する', how: 'メルカリで写真を撮って出品してみよう'},
+    {title: 'お手伝いを代行する', how: '家族や近所の人に声をかけてみよう'},
+    {title: '情報をまとめてノートで売る', how: 'きれいにまとめてフリマで売ってみよう'},
+  ],
+  middle: [
+    {title: 'SNSで情報発信してフォロワーを集める', how: 'InstagramやXで毎日発信してみよう'},
+    {title: 'まとめ資料を作ってメルカリで売る', how: 'PDFや手書きでまとめて出品しよう'},
+    {title: '代行サービスを提供する', how: 'SNSやクラスで告知してみよう'},
+    {title: 'オリジナル作品を受注制作する', how: 'DMやLINEで受け付けよう'},
+    {title: '小さな教室を開いて教える', how: 'オンラインや対面で少人数に教えよう'},
+  ],
+  high: [
+    {title: 'ネットショップを開設して販売する', how: 'BASEやメルカリShopsを使おう'},
+    {title: 'スキルマーケットで販売する', how: 'ココナラやタイムチケットに登録しよう'},
+    {title: 'コンテンツを作って継続販売する', how: 'noteで有料記事や定期購読を始めよう'},
+    {title: 'ブログ・SNSで広告収益を得る', how: 'アフィリエイトや広告収益を目指そう'},
+    {title: '地域のお店にサービスを提供する', how: '直接営業してサービスを売り込もう'},
+  ],
+  adult: [
+    {title: '副業として週末に提供する', how: 'クラウドソーシングやジモティーで案件を取ろう'},
+    {title: 'スキルをコンテンツ化して販売する', how: 'noteやUdemyで講座を作って売ろう'},
+    {title: 'フリーランスとして個人受注する', how: 'ランサーズやクラウドワークスに登録しよう'},
+    {title: 'コミュニティを作って月額収益を得る', how: 'LINEやDiscordで有料コミュニティを作ろう'},
+    {title: 'コンサルとして個別相談を受ける', how: 'SNSで発信して個別相談を受け付けよう'},
+  ],
+};
+
+function detectActions(suki) {
+  for (var key in verbMap) {
+    if (suki.indexOf(key) !== -1) return verbMap[key];
+  }
+  return ['まとめて教える', '情報を発信する', '代行サービスをする', 'オリジナル作品を作る', 'まとめ資料を売る'];
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function generate() {
+  var suki = document.getElementById('suki').value.trim();
+  var dare = document.getElementById('dare').value.trim();
+  var label = getLabel();
+  var results = document.getElementById('results');
+
+  if (!suki || !dare) {
+    results.innerHTML = '<div class="error">「好き（動詞）」と「誰のために」を入力してください。</div>';
+    return;
+  }
+  if (!currentGroup || !label) {
+    results.innerHTML = '<div class="error">年齢・学年を選んでください。</div>';
+    return;
+  }
+
+  var actions = shuffle(detectActions(suki));
+  var forms = shuffle(businessForms[currentGroup]).slice(0, 3);
+  var colors = ['#E8704A', '#4AADA8', '#1C2B4A'];
+
+  var html = '<div class="result-badge">' + label + '向けのアイデア</div>';
+  for (var i = 0; i < 3; i++) {
+    var action = actions[i] || actions[0];
+    var form = forms[i];
+    var title = dare + 'のための' + action + 'ビジネス';
+    var body = '「' + suki + '」が好きなあなたが、' + dare + 'のために' + form.title + '。' + form.how + '。';
+    html += '<div class="result-card" style="border-left-color:' + colors[i] + '">';
+    html += '<div class="result-num">アイデア ' + (i + 1) + '</div>';
+    html += '<div class="result-title">' + title + '</div>';
+    html += '<div class="result-body">' + body + '</div>';
+    html += '</div>';
+  }
+  html += '<button class="retry-btn" onclick="resetForm()">もう一度試す</button>';
+  results.innerHTML = html;
+
+  window.scrollTo({ top: document.getElementById('results').offsetTop - 20, behavior: 'smooth' });
+}
+
+function resetForm() {
+  document.getElementById('suki').value = '';
+  document.getElementById('dare').value = '';
+  document.getElementById('results').innerHTML = '';
+  currentGroup = '';
+  ['kids','middle','high','adult'].forEach(function(g) {
+    document.getElementById('tab-' + g).classList.remove('active');
+    document.getElementById('wrap-' + g).classList.remove('visible');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('suki').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('dare').focus();
+});
+</script>
+</body>
+</html>
