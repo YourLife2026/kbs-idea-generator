@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KBS ビジネスアイデアジェネレーター</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1C2B4A;
+    --orange: #E8704A;
+    --teal: #4AADA8;
+    --cream: #FBF6EE;
+    --white: #FFFFFF;
+    --text-dark: #1C2B4A;
+    --text-mid: #4A5A6A;
+    --text-light: #8899AA;
+    --border: #E5E9F0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ヘッダー */
+  .header {
+    background: var(--navy);
+    padding: 20px;
+    text-align: center;
+  }
+  .header-logo {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.4;
+  }
+  .header h1 span { color: var(--orange); }
+  .header p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+
+  /* メインコンテンツ */
+  .main {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* カード */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 12px rgba(28,43,74,0.07);
+  }
+  .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* フォーム */
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--cream);
+    color: var(--text-dark);
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--orange);
+    background: var(--white);
+  }
+  .field-hint {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 5px;
+    line-height: 1.5;
+  }
+
+  /* 年齢タブ */
+  .age-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .age-tab {
+    padding: 9px 4px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--cream);
+    color: var(--text-mid);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .age-tab:hover { border-color: var(--orange); color: var(--orange); }
+  .age-tab.active {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: var(--white);
+  }
+  .age-select-wrap { display: none; }
+  .age-select-wrap.visible { display: block; }
+
+  /* ボタン */
+  .btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    background: var(--orange);
+    border: none;
+    border-radius: 12px;
+    color: var(--white);
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: opacity 0.15s, transform 0.1s;
+    box-shadow: 0 4px 16px rgba(232,112,74,0.35);
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ローディング */
+  .loading {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--text-mid);
+    font-size: 14px;
+  }
+  .loading-dots {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .loading-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--orange);
+    animation: bounce 1.2s infinite;
+  }
+  .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-8px); }
+  }
+
+  /* 結果カード */
+  .result-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(28,43,74,0.07);
+    border-left: 4px solid var(--orange);
+    animation: fadeUp 0.4s ease both;
+  }
+  .result-card:nth-child(2) { animation-delay: 0.1s; border-left-color: var(--teal); }
+  .result-card:nth-child(3) { animation-delay: 0.2s; border-left-color: var(--navy); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .result-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .result-body {
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.8;
+  }
+
+  /* バッジ */
+  .result-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 50px;
+    background: rgba(232,112,74,0.1);
+    color: var(--orange);
+    margin-bottom: 14px;
+  }
+
+  /* エラー */
+  .error {
+    background: #FEF2F2;
+    border: 1.5px solid #FECACA;
+    border-radius: 10px;
+    padding: 14px;
+    color: #DC2626;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-top: 14px;
+  }
+
+  /* もう一度ボタン */
+  .retry-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-mid);
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 8px;
+    transition: all 0.15s;
+  }
+  .retry-btn:hover { border-color: var(--orange); color: var(--orange); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">KBS Kids Business School</div>
+  <h1>ビジネスアイデア<span>ジェネレーター</span></h1>
+  <p>「好き」と「誰のために」を入力するだけで<br>ビジネスアイデアを3つ提案します</p>
+</div>
+
+<div class="main">
+
+  <!-- 入力フォーム -->
+  <div class="card">
+    <div class="card-label">STEP 1　入力する</div>
+    <div class="field">
+      <label for="suki">好き（動詞）</label>
+      <input type="text" id="suki" placeholder="例：カードの相場を調べる" />
+      <div class="field-hint">「〇〇をするのが好き」という形で入力してね</div>
+    </div>
+    <div class="field">
+      <label for="dare">誰のために</label>
+      <input type="text" id="dare" placeholder="例：ポケモン初心者" />
+      <div class="field-hint">どんな人の役に立てそうか入力してね</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">STEP 2　年齢・学年を選ぶ</div>
+    <div class="age-tabs">
+      <button class="age-tab" onclick="selectAge('kids')" id="tab-kids">小学生</button>
+      <button class="age-tab" onclick="selectAge('middle')" id="tab-middle">中学生</button>
+      <button class="age-tab" onclick="selectAge('high')" id="tab-high">高校生</button>
+      <button class="age-tab" onclick="selectAge('adult')" id="tab-adult">大人</button>
+    </div>
+    <div class="age-select-wrap" id="wrap-kids">
+      <select id="sel-kids">
+        <option value="">学年を選んでね</option>
+        <option value="小学4年生">小学4年生</option>
+        <option value="小学5年生">小学5年生</option>
+        <option value="小学6年生">小学6年生</option>
+      </select>
+    </div>
+    <div class="age-select-wrap" id="wrap-middle">
+      <select id="sel-middle">
+        <option value="">学年を選んでね</option>
+        <option value="中学1年生">中学1年生</option>
+        <option value="中学2年生">中学2年生</option>
+        <option value="中学3年生">中学3年生</option>
+      </select>
+    </div>
+    <div class="age-select-wrap" id="wrap-high">
+      <select id="sel-high">
+        <option value="">学年を選んでね</option>
+        <option value="高校1年生">高校1年生</option>
+        <option value="高校2年生">高校2年生</option>
+        <option value="高校3年生">高校3年生</option>
+      </select>
+    </div>
+    <div class="age-select-wrap" id="wrap-adult">
+      <select id="sel-adult">
+        <option value="">年代を選んでね</option>
+        <option value="30代の会社員・保護者">30代</option>
+        <option value="40代の会社員・保護者">40代</option>
+        <option value="50代以上">50代以上</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" id="generateBtn" onclick="generate()">
+    アイデアを出してみる →
+  </button>
+
+  <div id="results" style="margin-top:20px;"></div>
+
+</div>
+
+<script>
+  const API_KEY = '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';
+  let currentGroup = '';
+
+  function selectAge(group) {
+    currentGroup = group;
+    ['kids','middle','high','adult'].forEach(g => {
+      document.getElementById('tab-' + g).classList.toggle('active', g === group);
+      document.getElementById('wrap-' + g).classList.toggle('visible', g === group);
+    });
+  }
+
+  function getLabel() {
+    if (!currentGroup) return '';
+    return document.getElementById('sel-' + currentGroup).value;
+  }
+
+  function getGuidance(label) {
+    if (label.includes('小学')) return '小学生向け。親のサポートがあってもOK。メルカリへの出品・手作り品販売・友達に教える・まとめシートを作るなど、シンプルで小さく始められるアイデア。難しいプログラミングやアプリは不要。';
+    if (label.includes('中学')) return '中学生向け。SNS発信・まとめノート作成・代行サービス・フリマ販売など、少し本格的だが自分でできるアイデア。';
+    if (label.includes('高校')) return '高校生向け。ネットショップ・スキル販売・コンテンツ制作・地域へのサービス提供など、より本格的なアイデア。';
+    if (label.includes('30代') || label.includes('40代') || label.includes('50代')) return '社会人・保護者向け。会社員としての経験・スキル・人脈を活かした副業・スモールビジネス。既存スキルの収益化や子育て経験を活かしたアイデアも歓迎。難易度は高めでもOK。';
+    return '現実的に始められるビジネスアイデアを提案する。';
+  }
+
+  async function generate() {
+    const suki = document.getElementById('suki').value.trim();
+    const dare = document.getElementById('dare').value.trim();
+    const label = getLabel();
+    const results = document.getElementById('results');
+    const btn = document.getElementById('generateBtn');
+
+    if (!suki || !dare) {
+      results.innerHTML = '<div class="error">「好き（動詞）」と「誰のために」を入力してください。</div>';
+      return;
+    }
+    if (!currentGroup || !label) {
+      results.innerHTML = '<div class="error">年齢・学年を選んでください。</div>';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '考え中...';
+    results.innerHTML = `
+      <div class="loading">
+        <div class="loading-dots">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
+        <div>ビジネスアイデアを考えています...</div>
+      </div>`;
+
+    const guidance = getGuidance(label);
+    const prompt = `あなたはキッズビジネススクール（KBS）のアシスタントです。以下の情報をもとに、実際にできそうなビジネスアイデアを3つ提案してください。
+
+好き（動詞）：${suki}
+誰のために：${dare}
+年齢・学年：${label}
+年齢に合わせた指針：${guidance}
+
+条件：
+1. ${label}が実際に始められる現実的なアイデア
+2. どうやってお金にするかを具体的に含める
+3. 分かりやすい言葉で書く
+4. 各アイデアは「タイトル（15文字以内）」と「説明（80文字程度）」
+
+必ずJSON形式のみで返してください。他の文章は不要です。
+{"ideas":[{"title":"タイトル","description":"説明"},{"title":"","description":""},{"title":"","description":""}]}`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error?.message || 'APIエラー');
+      }
+
+      const text = data.content.map(i => i.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      const colors = ['var(--orange)', 'var(--teal)', 'var(--navy)'];
+
+      let html = `<div class="result-badge">${label}向けのアイデア</div>`;
+      parsed.ideas.forEach((idea, i) => {
+        html += `
+          <div class="result-card" style="border-left-color:${colors[i]}">
+            <div class="result-num">アイデア ${i + 1}</div>
+            <div class="result-title">${idea.title}</div>
+            <div class="result-body">${idea.description}</div>
+          </div>`;
+      });
+      html += `<button class="retry-btn" onclick="resetForm()">もう一度試す</button>`;
+      results.innerHTML = html;
+
+    } catch (e) {
+      results.innerHTML = `<div class="error">エラーが発生しました。<br>しばらく待ってから再度お試しください。<br><small style="color:#999;font-size:11px;">${e.message}</small></div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'アイデアを出してみる →';
+  }
+
+  function resetForm() {
+    document.getElementById('suki').value = '';
+    document.getElementById('dare').value = '';
+    document.getElementById('results').innerHTML = '';
+    currentGroup = '';
+    ['kids','middle','high','adult'].forEach(g => {
+      document.getElementById('tab-' + g).classList.remove('active');
+      document.getElementById('wrap-' + g).classList.remove('visible');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('suki').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('dare').focus();
+  });
+</script>
+</body>
+</html>
