@@ -1,0 +1,1 @@
+# kbs-idea-generator
